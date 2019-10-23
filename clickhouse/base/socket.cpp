@@ -71,17 +71,17 @@ NetworkAddress::NetworkAddress(const std::string& host, const std::string& port)
     hints.ai_family = PF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
-    if (!Singleton<LocalNames>()->IsLocalName(host)) {
-        // https://linux.die.net/man/3/getaddrinfo
-        // If hints.ai_flags includes the AI_ADDRCONFIG flag,
-        // then IPv4 addresses are returned in the list pointed to by res only
-        // if the local system has at least one IPv4 address configured,
-        // and IPv6 addresses are only returned if the local system
-        // has at least one IPv6 address configured.
-        // The loopback address is not considered for this case
-        // as valid as a configured address.
-        hints.ai_flags |= AI_ADDRCONFIG;
-    }
+    // if (!Singleton<LocalNames>()->IsLocalName(host)) {
+    //     // https://linux.die.net/man/3/getaddrinfo
+    //     // If hints.ai_flags includes the AI_ADDRCONFIG flag,
+    //     // then IPv4 addresses are returned in the list pointed to by res only
+    //     // if the local system has at least one IPv4 address configured,
+    //     // and IPv6 addresses are only returned if the local system
+    //     // has at least one IPv6 address configured.
+    //     // The loopback address is not considered for this case
+    //     // as valid as a configured address.
+    //     hints.ai_flags |= AI_ADDRCONFIG;
+    // }
 
     const int error = getaddrinfo(host.c_str(), port.c_str(), &hints, &info_);
 
@@ -222,6 +222,7 @@ NetrworkInitializer::NetrworkInitializer() {
 
 
 SOCKET SocketConnect(const NetworkAddress& addr) {
+    int last_err=0;
     for (auto res = addr.Info(); res != nullptr; res = res->ai_next) {
         SOCKET s(socket(res->ai_family, res->ai_socktype, res->ai_protocol));
 
@@ -251,8 +252,8 @@ SOCKET SocketConnect(const NetworkAddress& addr) {
                         SetNonBlock(s, false);
                         return s;
                     }
-                    throw std::system_error(
-                     err, std::system_category(), "fail to connect"); 
+                    last_err=err;
+                    
                 }
             }
         } else {
@@ -260,7 +261,8 @@ SOCKET SocketConnect(const NetworkAddress& addr) {
             return s;
         }
     }
-
+    if(last_err>0)
+        throw std::system_error(last_err,std::system_category(),"fail to connect");
     throw std::system_error(
         errno, std::system_category(), "fail to connect"
     );
