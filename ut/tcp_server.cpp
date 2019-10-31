@@ -53,8 +53,8 @@ void LocalTcpServer::start()
         throw std::runtime_error("Error binding socket to local address" );
     }
     listen(serverSd_, 3);
-    std::thread thread(&LocalTcpServer::startImpl,this);
-    thread.detach();
+    // std::thread thread(&LocalTcpServer::startImpl,this);
+    // thread.detach();
     
 }
 
@@ -72,23 +72,23 @@ void LocalTcpServer::startImpl()
 
         }
         std::cout << "Connected with client!" << std::endl;
-        SocketHolder s(newSd);
-        socket_ = std::move(s);
-        socket_input_ = SocketInput(socket_);
-        socket_output_ = SocketOutput(socket_);
-        buffered_input_.Reset();
-        buffered_output_.Reset();
-        uint64_t packet_type = 0;
+        // SocketHolder s(newSd);
+        // socket_ = std::move(s);
+        // socket_input_ = SocketInput(socket_);
+        // socket_output_ = SocketOutput(socket_);
+        // buffered_input_.Reset();
+        // buffered_output_.Reset();
+        // uint64_t packet_type = 0;
 
-        if (!input_.ReadVarint64(&packet_type)) {
-            throw std::runtime_error("not able to read from client" );
-        }
-        if (packet_type == ServerCodes::Hello) {
-            std::cout<<"got hello from client"<<std::endl;
-        }else{
-            std::cout<<"not get client hello close the connection"<<std::endl;
-            shutdown(newSd,SHUT_WR);
-        }
+        // if (!input_.ReadVarint64(&packet_type)) {
+        //     throw std::runtime_error("not able to read from client" );
+        // }
+        // if (packet_type == ServerCodes::Hello) {
+        //     std::cout<<"got hello from client"<<std::endl;
+        // }else{
+        //     std::cout<<"not get client hello close the connection"<<std::endl;
+        //     shutdown(newSd,SHUT_WR);
+        // }
 
     }
     
@@ -107,3 +107,18 @@ void LocalTcpServer::stop()
 
 
 }
+
+
+// int main()
+// {
+//     /* code */
+//     clickhouse::LocalTcpServer server(9978);
+//     server.start();
+//     std::cout<<"start to sleep"<<"\n";
+//     std::this_thread::sleep_for(std::chrono::seconds(5));
+//     std::cout<<"stop"<<"\n";
+//     server.stop();
+
+//     return 0;
+// }
+

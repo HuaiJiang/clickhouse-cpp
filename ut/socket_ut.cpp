@@ -18,20 +18,20 @@ using namespace clickhouse;
 
 
 TEST(Socketcase, connectnoerror) {
-   int port=9977;
+   int port=9978;
    NetworkAddress addr("localhost",std::to_string(port));
    
    LocalTcpServer server(port);
    server.start();
    std::this_thread::sleep_for(std::chrono::seconds(1));
-   SocketConnect(addr);
+   try{
+      SocketConnect(addr);
+   }catch(const std::system_error& e)
+   {
+      FAIL();
+   }
+   std::this_thread::sleep_for(std::chrono::seconds(1));
    server.stop();
-}
-
-
-TEST(Socketcase, connecterror) {
-   int port=9978;
-   NetworkAddress addr("localhost",std::to_string(port));
    try{
       SocketConnect(addr);
       FAIL();
@@ -40,5 +40,5 @@ TEST(Socketcase, connecterror) {
       ASSERT_NE(EINPROGRESS,e.code().value());
    }
    
- 
 }
+

@@ -6,7 +6,7 @@
 #include <system_error>
 #include <unordered_set>
 #include <memory.h>
-
+#include <iostream>
 #if !defined(_win_)
 #   include <errno.h>
 #   include <fcntl.h>
@@ -247,7 +247,6 @@ SOCKET SocketConnect(const NetworkAddress& addr) {
                 if (rval > 0) {
                     socklen_t len = sizeof(err);
                     getsockopt(s, SOL_SOCKET, SO_ERROR, (char*)&err, &len);
-
                     if (!err) {
                         SetNonBlock(s, false);
                         return s;
